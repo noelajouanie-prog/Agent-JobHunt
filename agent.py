@@ -28,11 +28,11 @@ html = f"""
 <pre style="font-family: Arial; font-size: 14px; line-height: 1.6">{contenu}</pre>
 """
 
-resend.Emails.send({{
-    "from": "agent@resend.dev",
+resend.Emails.send({
+    "from": "onboarding@resend.dev",
     "to": os.environ["EMAIL_DESTINATAIRE"],
     "subject": "🔍 Tes offres d'emploi du jour",
     "html": html
-}})
+})
 
 print("Email envoyé avec succès !")
