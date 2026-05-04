@@ -10,49 +10,41 @@ client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
 date_limite = (datetime.now() - timedelta(days=10)).strftime("%Y-%m-%d")
 
+def api_call(**kwargs):
+    for attempt in range(5):
+        try:
+            return client.messages.create(**kwargs)
+        except anthropic.RateLimitError:
+            if attempt == 4:
+                raise
+            wait = 60 * (attempt + 1)
+            print(f"Rate limit atteint, attente {wait}s...")
+            time.sleep(wait)
+
 ENTREPRISES = [
-    # AI Tools
     "Harvey", "Dust", "Legora", "Mistral AI", "Writer",
     "Hugging Face", "Cohere", "Glean", "Weights & Biases", "Scale AI",
-    # CRM / Sales
     "HubSpot", "Salesforce", "Zendesk", "Freshworks", "Pipedrive",
-    # Cybersécurité
     "Cloudflare", "CrowdStrike", "Palo Alto Networks", "SentinelOne",
     "Wiz", "Okta", "Zscaler", "Netskope",
-    # Cloud / Infra
     "Cisco", "Microsoft", "Google", "SAP", "Akamai", "Fastly",
-    # Database / Data
     "Snowflake", "Databricks", "MongoDB", "Elastic", "Confluent",
-    # HR Tech
     "Workday", "Deel", "Personio", "Rippling",
-    # Payment / Fintech
     "Stripe", "Adyen", "Checkout.com", "Spendesk", "Pennylane",
     "Kyriba", "Ivalua", "Tipalti",
-    # Marketing Tech
     "Braze", "Contentsquare", "Klaviyo", "Amplitude",
-    # DevOps / Monitoring
     "Datadog", "GitLab", "HashiCorp", "PagerDuty",
     "Dynatrace", "New Relic", "Grafana Labs",
-    # Collaboration / Productivité
     "Notion", "Atlassian", "Miro", "Monday.com",
     "Asana", "Smartsheet", "ClickUp",
-    # Sales Intelligence
     "Gong", "Outreach", "Salesloft", "Highspot", "Seismic", "Showpad",
-    # Communication / CPaaS
     "Twilio", "Sinch", "Zoom", "RingCentral",
-    # Legal Tech
     "Ironclad", "Juro", "Clio",
-    # ERP / Finance
     "Coupa", "Workiva", "Sage", "Celonis",
-    # Customer Success / Support
     "Gainsight", "Intercom", "Medallia", "Sprinklr",
-    # Integration / iPaaS
     "MuleSoft", "Workato", "Boomi",
-    # E-commerce / Retail Tech
     "Mirakl", "Commercetools", "Shopify", "Contentful",
-    # French scale-ups B2B
     "Qonto", "Pigment", "Alan", "360Learning",
-    # Autres
     "Veeva Systems", "DocuSign", "ServiceNow", "ThoughtSpot",
 ]
 
@@ -76,7 +68,7 @@ Règles de recherche obligatoires :
 {CRITERES}"""
 }]
 
-response = client.messages.create(
+response = api_call(
     model="claude-sonnet-4-6",
     max_tokens=8000,
     tools=tools,
@@ -87,7 +79,7 @@ response = client.messages.create(
 while response.stop_reason == "pause_turn":
     messages.append({"role": "assistant", "content": response.content})
     time.sleep(30)
-    response = client.messages.create(
+    response = api_call(
         model="claude-sonnet-4-6",
         max_tokens=8000,
         tools=tools,
