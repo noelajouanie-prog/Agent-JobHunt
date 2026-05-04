@@ -1,6 +1,7 @@
 import anthropic
 import os
 import resend
+import time
 from datetime import datetime, timedelta
 
 resend.api_key = os.environ["RESEND_API_KEY"]
@@ -85,6 +86,7 @@ response = client.messages.create(
 
 while response.stop_reason == "pause_turn":
     messages.append({"role": "assistant", "content": response.content})
+    time.sleep(30)
     response = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=8000,
