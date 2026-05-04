@@ -69,7 +69,7 @@ Règles de recherche obligatoires :
 }]
 
 response = api_call(
-    model="claude-sonnet-4-6",
+    model="claude-haiku-4-5",
     max_tokens=8000,
     tools=tools,
     tool_choice={"type": "any"},
@@ -80,7 +80,7 @@ while response.stop_reason == "pause_turn":
     messages.append({"role": "assistant", "content": response.content})
     time.sleep(30)
     response = api_call(
-        model="claude-sonnet-4-6",
+        model="claude-haiku-4-5",
         max_tokens=8000,
         tools=tools,
         messages=messages,
